@@ -20,7 +20,9 @@ func (s *server) WithWeight(weight int) *server {
 	if weight <= 0 {
 		panic("weight must be greater than 0")
 	}
+
 	s.Weight = weight
+
 	return s
 }
 
@@ -57,6 +59,7 @@ func (b *Balancer) Next() *server {
 
 	if next != nil {
 		next.currentWeight -= b.totalWeight
+
 		for i := range b.servers {
 			b.servers[i].currentWeight += b.servers[i].Weight
 		}
