@@ -21,9 +21,9 @@ func TestSimpleRoundRobin(t *testing.T) {
 
 func TestWeightedRoundRobin(t *testing.T) {
 	b := roundrobin.New(
-		roundrobin.NewServer("127.0.0.1").WithWeigth(3),
-		roundrobin.NewServer("192.168.0.1").WithWeigth(2),
-		roundrobin.NewServer("192.170.0.1").WithWeigth(1),
+		roundrobin.NewServer("127.0.0.1").WithWeight(3),
+		roundrobin.NewServer("192.168.0.1").WithWeight(2),
+		roundrobin.NewServer("192.170.0.1").WithWeight(1),
 	)
 	assert.Equal(t, b.Next().Address, "127.0.0.1")
 	assert.Equal(t, b.Next().Address, "192.168.0.1")

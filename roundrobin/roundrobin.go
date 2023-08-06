@@ -4,34 +4,42 @@ import "sync"
 
 type server struct {
 	Address       string
-	Weigth        int
-	CurrentWeigth int
+	Weight        int
+	currentWeight int
 }
 
 func NewServer(address string) *server {
 	return &server{
 		Address:       address,
-		Weigth:        1,
-		CurrentWeigth: 0,
+		Weight:        1,
+		currentWeight: 1,
 	}
 }
 
-func (s *server) WithWeigth(weigth int) *server {
-	if weigth <= 0 {
+func (s *server) WithWeight(weight int) *server {
+	if weight <= 0 {
 		panic("weight must be greater than 0")
 	}
-	s.Weigth = weigth
+	s.Weight = weight
 	return s
 }
 
 type Balancer struct {
-	servers []*server
-	m       sync.Mutex
+	servers     []*server
+	m           sync.Mutex
+	totalWeight int
 }
 
 func New(servers ...*server) *Balancer {
+	totalWeight := 0
+	for _, server := range servers {
+		totalWeight += server.Weight
+		server.currentWeight = server.Weight
+	}
+
 	return &Balancer{
-		servers: servers,
+		servers:     servers,
+		totalWeight: totalWeight,
 	}
 }
 
@@ -39,22 +47,22 @@ func (b *Balancer) Next() *server {
 	b.m.Lock()
 	defer b.m.Unlock()
 
-	maxIndex := -1
-	totalWeight := 0
+	var next *server
 
-	for idx, server := range b.servers {
-		b.servers[idx].CurrentWeigth += server.Weigth
-
-		totalWeight += server.Weigth
-
-		if maxIndex == -1 || b.servers[maxIndex].CurrentWeigth < b.servers[idx].CurrentWeigth {
-			maxIndex = idx
+	for i, s := range b.servers {
+		if next == nil || s.currentWeight > next.currentWeight {
+			next = b.servers[i]
 		}
 	}
 
-	b.servers[maxIndex].CurrentWeigth -= totalWeight
+	if next != nil {
+		next.currentWeight -= b.totalWeight
+		for i := range b.servers {
+			b.servers[i].currentWeight += b.servers[i].Weight
+		}
+	}
 
-	return b.servers[maxIndex]
+	return next
 }
 
 func (b *Balancer) Add(s *server) {
