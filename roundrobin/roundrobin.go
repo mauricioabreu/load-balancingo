@@ -75,6 +75,18 @@ func (b *Balancer) Add(s *server) {
 	b.servers = append(b.servers, s)
 }
 
+func (b *Balancer) Remove(address string) {
+	b.m.Lock()
+	defer b.m.Unlock()
+
+	for i := range b.servers {
+		if b.servers[i].Address == address {
+			b.servers = append(b.servers[:i], b.servers[i+1:]...)
+			break
+		}
+	}
+}
+
 func (b *Balancer) Servers() []*server {
 	return b.servers
 }

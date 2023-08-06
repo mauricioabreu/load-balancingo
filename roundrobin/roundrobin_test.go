@@ -41,3 +41,14 @@ func TestAddServer(t *testing.T) {
 	b.Add(roundrobin.NewServer("192.170.0.1"))
 	assert.Equal(t, len(b.Servers()), 3)
 }
+
+func TestRemoveServer(t *testing.T) {
+	b := roundrobin.New(
+		roundrobin.NewServer("127.0.0.1"),
+		roundrobin.NewServer("192.168.0.1"),
+	)
+	assert.Equal(t, len(b.Servers()), 2)
+
+	b.Remove("192.168.0.1")
+	assert.Equal(t, len(b.Servers()), 1)
+}
