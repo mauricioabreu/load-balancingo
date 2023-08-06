@@ -36,6 +36,9 @@ func New(servers ...*server) *Balancer {
 }
 
 func (b *Balancer) Next() *server {
+	b.m.Lock()
+	defer b.m.Unlock()
+
 	maxIndex := -1
 	totalWeight := 0
 
