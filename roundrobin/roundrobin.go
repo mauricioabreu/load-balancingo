@@ -1,3 +1,4 @@
+// Package roundrobin provides a simple and weighted implementation of the round robin algorithm.
 package roundrobin
 
 import (
@@ -16,6 +17,7 @@ type server struct {
 	currentWeight int
 }
 
+// NewServer creates a new server with a default weight of 1.
 func NewServer(address string) *server {
 	return &server{
 		Address:       address,
@@ -24,6 +26,7 @@ func NewServer(address string) *server {
 	}
 }
 
+// WithWeight sets the server's weight. If provided weight is 0 or negative, it defaults to 1.
 func (s *server) WithWeight(weight int) *server {
 	if weight <= 0 {
 		weight = 1
@@ -34,12 +37,14 @@ func (s *server) WithWeight(weight int) *server {
 	return s
 }
 
+// Balancer is a weighted round robin balancer for servers.
 type Balancer struct {
 	servers     []*server
 	m           sync.Mutex
 	totalWeight int
 }
 
+// New creates a new balancer with the provided servers.
 func New(servers ...*server) *Balancer {
 	totalWeight := 0
 	for _, server := range servers {
@@ -53,6 +58,7 @@ func New(servers ...*server) *Balancer {
 	}
 }
 
+// Next selects the next server based on the weighted round robin algorithm.
 func (b *Balancer) Next() *server {
 	b.m.Lock()
 	defer b.m.Unlock()
@@ -76,6 +82,7 @@ func (b *Balancer) Next() *server {
 	return next
 }
 
+// Add adds a server to the balancer.
 func (b *Balancer) Add(s *server) error {
 	b.m.Lock()
 	defer b.m.Unlock()
@@ -90,6 +97,7 @@ func (b *Balancer) Add(s *server) error {
 	return nil
 }
 
+// Remove removes a server from the balancer by its address.
 func (b *Balancer) Remove(address string) error {
 	b.m.Lock()
 	defer b.m.Unlock()
@@ -120,6 +128,7 @@ func (b *Balancer) exists(address string) bool {
 	return false
 }
 
+// Servers returns a list of servers currently in the balancer
 func (b *Balancer) Servers() []*server {
 	return b.servers
 }
