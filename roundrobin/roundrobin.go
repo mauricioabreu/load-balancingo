@@ -26,7 +26,7 @@ func NewServer(address string) *server {
 
 func (s *server) WithWeight(weight int) *server {
 	if weight <= 0 {
-		panic("weight must be greater than 0")
+		weight = 1
 	}
 
 	s.Weight = weight

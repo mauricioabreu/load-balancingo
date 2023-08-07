@@ -43,6 +43,14 @@ func TestAddServer(t *testing.T) {
 	assert.Equal(t, len(b.Servers()), 3)
 }
 
+func TestAddServerWithWeight(t *testing.T) {
+	s1 := roundrobin.NewServer("127.0.0.1").WithWeight(2)
+	assert.Equal(t, s1.Weight, 2)
+
+	s2 := roundrobin.NewServer("127.0.0.1").WithWeight(0)
+	assert.Equal(t, s2.Weight, 1)
+}
+
 func TestAddServerWhenAlreadyExists(t *testing.T) {
 	b := roundrobin.New(
 		roundrobin.NewServer("127.0.0.1"),
