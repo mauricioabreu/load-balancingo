@@ -59,9 +59,9 @@ func (b *Balancer) Next() *server {
 
 	var next *server
 
-	for i, s := range b.servers {
+	for _, s := range b.servers {
 		if next == nil || s.currentWeight > next.currentWeight {
-			next = b.servers[i]
+			next = s
 		}
 	}
 
