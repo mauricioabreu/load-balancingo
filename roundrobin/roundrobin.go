@@ -86,6 +86,7 @@ func (b *Balancer) Add(s *server) error {
 
 	b.servers = append(b.servers, s)
 	b.totalWeight += s.Weight
+
 	return nil
 }
 
@@ -101,6 +102,7 @@ func (b *Balancer) Remove(address string) error {
 		if b.servers[i].Address == address {
 			b.totalWeight -= b.servers[i].Weight
 			b.servers = append(b.servers[:i], b.servers[i+1:]...)
+
 			break
 		}
 	}
