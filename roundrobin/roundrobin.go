@@ -80,7 +80,7 @@ func (b *Balancer) Add(s *server) error {
 	b.m.Lock()
 	defer b.m.Unlock()
 
-	if b.Exists(s.Address) {
+	if b.exists(s.Address) {
 		return ErrServerAlreadyExists
 	}
 
@@ -93,7 +93,7 @@ func (b *Balancer) Remove(address string) error {
 	b.m.Lock()
 	defer b.m.Unlock()
 
-	if !b.Exists(address) {
+	if !b.exists(address) {
 		return ErrServerDoesNotExist
 	}
 
@@ -108,7 +108,7 @@ func (b *Balancer) Remove(address string) error {
 	return nil
 }
 
-func (b *Balancer) Exists(address string) bool {
+func (b *Balancer) exists(address string) bool {
 	for _, s := range b.servers {
 		if s.Address == address {
 			return true
