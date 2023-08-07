@@ -1,6 +1,14 @@
 package roundrobin
 
-import "sync"
+import (
+	"errors"
+	"sync"
+)
+
+var (
+	ErrServerAlreadyExists = errors.New("server already exists")
+	ErrServerDoesNotExist  = errors.New("server does not exist")
+)
 
 type server struct {
 	Address       string
@@ -68,16 +76,25 @@ func (b *Balancer) Next() *server {
 	return next
 }
 
-func (b *Balancer) Add(s *server) {
+func (b *Balancer) Add(s *server) error {
 	b.m.Lock()
 	defer b.m.Unlock()
+
+	if b.Exists(s.Address) {
+		return ErrServerAlreadyExists
+	}
 
 	b.servers = append(b.servers, s)
+	return nil
 }
 
-func (b *Balancer) Remove(address string) {
+func (b *Balancer) Remove(address string) error {
 	b.m.Lock()
 	defer b.m.Unlock()
+
+	if !b.Exists(address) {
+		return ErrServerDoesNotExist
+	}
 
 	for i := range b.servers {
 		if b.servers[i].Address == address {
@@ -85,6 +102,18 @@ func (b *Balancer) Remove(address string) {
 			break
 		}
 	}
+
+	return nil
+}
+
+func (b *Balancer) Exists(address string) bool {
+	for _, s := range b.servers {
+		if s.Address == address {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (b *Balancer) Servers() []*server {
