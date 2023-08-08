@@ -16,6 +16,16 @@ const (
 	IdleTimeout  = 2 * time.Second
 )
 
+func newServer(address string, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:         address,
+		Handler:      handler,
+		ReadTimeout:  ReadTimeout,
+		WriteTimeout: WriteTimeout,
+		IdleTimeout:  IdleTimeout,
+	}
+}
+
 func startServer(address string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -23,13 +33,7 @@ func startServer(address string) {
 		fmt.Fprintf(w, "Hello from %s\n", address)
 	})
 
-	server := &http.Server{
-		Addr:         address,
-		Handler:      mux,
-		ReadTimeout:  ReadTimeout,
-		WriteTimeout: WriteTimeout,
-		IdleTimeout:  IdleTimeout,
-	}
+	server := newServer(address, mux)
 
 	log.Fatal(server.ListenAndServe())
 }
@@ -42,13 +46,7 @@ func main() {
 
 	rrproxy := proxy.NewRoundRobinProxy(balancer)
 
-	server := &http.Server{
-		Addr:         ":8080",
-		Handler:      nil,
-		ReadTimeout:  ReadTimeout,
-		WriteTimeout: WriteTimeout,
-		IdleTimeout:  IdleTimeout,
-	}
+	server := newServer(":8080", nil)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		rrproxy.ServeHTTP(w, r)
