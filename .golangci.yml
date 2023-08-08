@@ -27,6 +27,9 @@ linters-settings:
   nolintlint:
     require-explanation: true
     require-specific: true
+  gosec:
+    excludes:
+      - G404
 
 linters:
   enable:
