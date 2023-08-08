@@ -44,7 +44,7 @@ func main() {
 		roundrobin.NewServer("http://127.0.0.1:8082"),
 	)
 
-	rrproxy := proxy.NewRoundRobinProxy(balancer)
+	rrproxy := proxy.NewProxy(balancer)
 
 	server := newServer(":8080", nil)
 

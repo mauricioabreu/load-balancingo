@@ -11,7 +11,7 @@ type Balancer interface {
 	NextAddress() string
 }
 
-func NewRoundRobinProxy(b Balancer) *httputil.ReverseProxy {
+func NewProxy(b Balancer) *httputil.ReverseProxy {
 	p := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			target, err := url.Parse(b.NextAddress())
