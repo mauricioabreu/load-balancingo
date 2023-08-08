@@ -86,6 +86,10 @@ func (b *Balancer) Next() *server {
 	return srv2
 }
 
+func (b *Balancer) NextAddress() string {
+	return b.Next().address
+}
+
 func (b *Balancer) Servers() []*server {
 	return b.servers
 }
