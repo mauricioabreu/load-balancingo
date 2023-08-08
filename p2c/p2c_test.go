@@ -16,14 +16,39 @@ func (f *fakeLoadFetcher) FetchLoad() int {
 }
 
 func TestP2CWithOneServerOnly(t *testing.T) {
-	p2c := p2c.New(p2c.NewServer("127.0.0.1", &fakeLoadFetcher{load: 1}))
-	assert.Equal(t, p2c.Next().Address(), "127.0.0.1")
+	b := p2c.New(p2c.NewServer("127.0.0.1", &fakeLoadFetcher{load: 1}))
+	assert.Equal(t, b.Next().Address(), "127.0.0.1")
 }
 
 func TestP2CWithTwoServers(t *testing.T) {
-	p2c := p2c.New(
+	b := p2c.New(
 		p2c.NewServer("127.0.0.1", &fakeLoadFetcher{load: 1}),
 		p2c.NewServer("192.168.0.1", &fakeLoadFetcher{load: 2}),
 	)
-	assert.Equal(t, p2c.Next().Address(), "127.0.0.1")
+	assert.Equal(t, b.Next().Address(), "127.0.0.1")
+}
+
+func TestRandomDistribution(t *testing.T) {
+	b := p2c.New(
+		p2c.NewServer("127.0.0.1", &fakeLoadFetcher{load: 1}),
+		p2c.NewServer("192.168.0.1", &fakeLoadFetcher{load: 1}),
+		p2c.NewServer("192.170.0.1", &fakeLoadFetcher{load: 1}),
+	)
+
+	counter := make(map[string]int)
+	iterations := 100
+
+	for i := 0; i < iterations; i++ {
+		srv := b.Next()
+		counter[srv.Address()]++
+	}
+
+	expectedCount := iterations / len(b.Servers())
+	tolerance := expectedCount / 2
+
+	for addr, count := range counter {
+		if count < (expectedCount-tolerance) || count > (expectedCount+tolerance) {
+			t.Fatalf("server %s has an unexpected selection count: %d", addr, count)
+		}
+	}
 }

@@ -14,7 +14,8 @@ const (
 type server struct {
 	address   string
 	fetchLoad LoadFetcher
-	loadCh    chan int
+	load      int
+	lock      sync.RWMutex
 }
 
 // NewServer creates a new server.
@@ -22,7 +23,7 @@ func NewServer(address string, lf LoadFetcher) *server {
 	return &server{
 		address:   address,
 		fetchLoad: lf,
-		loadCh:    make(chan int, 1),
+		load:      0,
 	}
 }
 
@@ -42,11 +43,15 @@ func (r *RandomLoadFetcher) FetchLoad() int {
 
 func (s *server) StartFetchLoader(interval time.Duration) {
 	ticker := time.NewTicker(interval)
-	s.loadCh <- s.fetchLoad.FetchLoad()
+	s.load = s.fetchLoad.FetchLoad()
 
 	go func() {
 		for range ticker.C {
-			s.loadCh <- s.fetchLoad.FetchLoad()
+			newLoad := s.fetchLoad.FetchLoad()
+
+			s.lock.Lock()
+			s.load = newLoad
+			s.lock.Unlock()
 		}
 	}()
 }
@@ -74,14 +79,15 @@ func (b *Balancer) Next() *server {
 
 	srv1, srv2 := b.getRandomServers()
 
-	load1 := <-srv1.loadCh
-	load2 := <-srv2.loadCh
-
-	if load1 < load2 {
+	if srv1.load < srv2.load {
 		return srv1
 	}
 
 	return srv2
+}
+
+func (b *Balancer) Servers() []*server {
+	return b.servers
 }
 
 func (b *Balancer) getRandomServers() (srv1, srv2 *server) {
@@ -92,7 +98,7 @@ func (b *Balancer) getRandomServers() (srv1, srv2 *server) {
 	idx1 := rand.Intn(len(b.servers))
 	idx2 := rand.Intn(len(b.servers))
 
-	if idx1 == idx2 {
+	for idx1 == idx2 {
 		idx2 = rand.Intn(len(b.servers))
 	}
 
