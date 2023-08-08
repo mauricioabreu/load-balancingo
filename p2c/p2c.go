@@ -2,6 +2,7 @@ package p2c
 
 import (
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -17,9 +18,11 @@ type server struct {
 }
 
 // NewServer creates a new server.
-func NewServer(address string) *server {
+func NewServer(address string, lf LoadFetcher) *server {
 	return &server{
-		address: address,
+		address:   address,
+		fetchLoad: lf,
+		loadCh:    make(chan int, 1),
 	}
 }
 
@@ -33,22 +36,24 @@ type LoadFetcher interface {
 
 type RandomLoadFetcher struct{}
 
-func (r *RandomLoadFetcher) LoadFetcher() int {
+func (r *RandomLoadFetcher) FetchLoad() int {
 	return rand.Intn(maxLoad)
 }
 
 func (s *server) StartFetchLoader(interval time.Duration) {
 	ticker := time.NewTicker(interval)
+	s.loadCh <- s.fetchLoad.FetchLoad()
+
 	go func() {
 		for range ticker.C {
-			load := s.fetchLoad.FetchLoad()
-			s.loadCh <- load
+			s.loadCh <- s.fetchLoad.FetchLoad()
 		}
 	}()
 }
 
 type Balancer struct {
 	servers []*server
+	m       sync.Mutex
 }
 
 func New(servers ...*server) *Balancer {
@@ -60,6 +65,9 @@ func New(servers ...*server) *Balancer {
 }
 
 func (b *Balancer) Next() *server {
+	b.m.Lock()
+	defer b.m.Unlock()
+
 	if len(b.servers) == 1 {
 		return b.servers[0]
 	}
@@ -85,7 +93,7 @@ func (b *Balancer) getRandomServers() (srv1, srv2 *server) {
 	idx2 := rand.Intn(len(b.servers))
 
 	if idx1 == idx2 {
-		return b.getRandomServers()
+		idx2 = rand.Intn(len(b.servers))
 	}
 
 	return b.servers[idx1], b.servers[idx2]
