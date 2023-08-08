@@ -13,10 +13,10 @@ func TestSimpleRoundRobin(t *testing.T) {
 		roundrobin.NewServer("192.168.0.1"),
 		roundrobin.NewServer("192.170.0.1"),
 	)
-	assert.Equal(t, b.Next().Address, "127.0.0.1")
-	assert.Equal(t, b.Next().Address, "192.168.0.1")
-	assert.Equal(t, b.Next().Address, "192.170.0.1")
-	assert.Equal(t, b.Next().Address, "127.0.0.1")
+	assert.Equal(t, b.Next().Address(), "127.0.0.1")
+	assert.Equal(t, b.Next().Address(), "192.168.0.1")
+	assert.Equal(t, b.Next().Address(), "192.170.0.1")
+	assert.Equal(t, b.Next().Address(), "127.0.0.1")
 }
 
 func TestWeightedRoundRobin(t *testing.T) {
@@ -25,10 +25,10 @@ func TestWeightedRoundRobin(t *testing.T) {
 		roundrobin.NewServer("192.168.0.1").WithWeight(2),
 		roundrobin.NewServer("192.170.0.1").WithWeight(1),
 	)
-	assert.Equal(t, b.Next().Address, "127.0.0.1")
-	assert.Equal(t, b.Next().Address, "192.168.0.1")
-	assert.Equal(t, b.Next().Address, "127.0.0.1")
-	assert.Equal(t, b.Next().Address, "192.170.0.1")
+	assert.Equal(t, b.Next().Address(), "127.0.0.1")
+	assert.Equal(t, b.Next().Address(), "192.168.0.1")
+	assert.Equal(t, b.Next().Address(), "127.0.0.1")
+	assert.Equal(t, b.Next().Address(), "192.170.0.1")
 }
 
 func TestAddServer(t *testing.T) {
@@ -45,10 +45,10 @@ func TestAddServer(t *testing.T) {
 
 func TestAddServerWithWeight(t *testing.T) {
 	s1 := roundrobin.NewServer("127.0.0.1").WithWeight(2)
-	assert.Equal(t, s1.Weight, 2)
+	assert.Equal(t, s1.Weight(), 2)
 
 	s2 := roundrobin.NewServer("127.0.0.1").WithWeight(0)
-	assert.Equal(t, s2.Weight, 1)
+	assert.Equal(t, s2.Weight(), 1)
 }
 
 func TestAddServerWhenAlreadyExists(t *testing.T) {

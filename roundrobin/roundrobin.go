@@ -12,18 +12,26 @@ var (
 )
 
 type server struct {
-	Address       string
-	Weight        int
+	address       string
+	weight        int
 	currentWeight int
 }
 
 // NewServer creates a new server with a default weight of 1.
 func NewServer(address string) *server {
 	return &server{
-		Address:       address,
-		Weight:        1,
+		address:       address,
+		weight:        1,
 		currentWeight: 1,
 	}
+}
+
+func (s *server) Address() string {
+	return s.address
+}
+
+func (s *server) Weight() int {
+	return s.weight
 }
 
 // WithWeight sets the server's weight. If provided weight is 0 or negative, it defaults to 1.
@@ -32,7 +40,7 @@ func (s *server) WithWeight(weight int) *server {
 		weight = 1
 	}
 
-	s.Weight = weight
+	s.weight = weight
 
 	return s
 }
@@ -48,8 +56,8 @@ type Balancer struct {
 func New(servers ...*server) *Balancer {
 	totalWeight := 0
 	for _, server := range servers {
-		totalWeight += server.Weight
-		server.currentWeight = server.Weight
+		totalWeight += server.weight
+		server.currentWeight = server.weight
 	}
 
 	return &Balancer{
@@ -75,11 +83,21 @@ func (b *Balancer) Next() *server {
 		next.currentWeight -= b.totalWeight
 
 		for i := range b.servers {
-			b.servers[i].currentWeight += b.servers[i].Weight
+			b.servers[i].currentWeight += b.servers[i].weight
 		}
 	}
 
 	return next
+}
+
+func (b *Balancer) NextAddress() string {
+	next := b.Next()
+
+	if next == nil {
+		return ""
+	}
+
+	return next.Address()
 }
 
 // Add adds a server to the balancer.
@@ -87,12 +105,12 @@ func (b *Balancer) Add(s *server) error {
 	b.m.Lock()
 	defer b.m.Unlock()
 
-	if b.exists(s.Address) {
+	if b.exists(s.address) {
 		return ErrServerAlreadyExists
 	}
 
 	b.servers = append(b.servers, s)
-	b.totalWeight += s.Weight
+	b.totalWeight += s.weight
 
 	return nil
 }
@@ -107,8 +125,8 @@ func (b *Balancer) Remove(address string) error {
 	}
 
 	for i := range b.servers {
-		if b.servers[i].Address == address {
-			b.totalWeight -= b.servers[i].Weight
+		if b.servers[i].address == address {
+			b.totalWeight -= b.servers[i].weight
 			b.servers = append(b.servers[:i], b.servers[i+1:]...)
 
 			break
@@ -120,7 +138,7 @@ func (b *Balancer) Remove(address string) error {
 
 func (b *Balancer) exists(address string) bool {
 	for _, s := range b.servers {
-		if s.Address == address {
+		if s.address == address {
 			return true
 		}
 	}
