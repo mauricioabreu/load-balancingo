@@ -69,6 +69,10 @@ func New(servers ...*server) *Balancer {
 	return &Balancer{servers: servers}
 }
 
+// Next returns the next server to be used for load balancing using the power of two choices algorithm.
+// It locks the mutex to avoid race conditions and returns the server with the lowest load.
+// If there is only one server available, it returns that server.
+// If there are two or more servers available, it randomly selects two servers and returns the one with the lowest load.
 func (b *Balancer) Next() *server {
 	b.m.Lock()
 	defer b.m.Unlock()
