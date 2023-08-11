@@ -3,7 +3,7 @@
 ## Testing
 
 You need the go toolchain installed. Then, run `go run main.go` in the root directory.
-This command will start a server in the 8080 port to receive requests. There are one route for each balancing algorithm:
+This command will start a server in the 8080 port to receive requests. There is one route for each balancing algorithm:
 
 * `/rr` - Round Robin
 * `/p2c` - Power of Two Choices
