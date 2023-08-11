@@ -69,6 +69,10 @@ func New(servers ...*server) *Balancer {
 	return &Balancer{servers: servers}
 }
 
+func (b *Balancer) Algorithm() string {
+	return "p2c"
+}
+
 // Next returns the next server to be used for load balancing using the power of two choices algorithm.
 // It locks the mutex to avoid race conditions and returns the server with the lowest load.
 // If there is only one server available, it returns that server.

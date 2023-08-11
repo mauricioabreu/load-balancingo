@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/mauricioabreu/load-balancingo/metric"
 )
 
 type Balancer interface {
 	NextAddress() string
+	Algorithm() string
 }
 
 // NewProxy implements a reverse proxy that will load balance requests.
@@ -17,7 +20,9 @@ type Balancer interface {
 func NewProxy(b Balancer) *httputil.ReverseProxy {
 	p := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
-			target, err := url.Parse(b.NextAddress())
+			nextServer := b.NextAddress()
+			metric.CountUsedAlgorithm(nextServer, b.Algorithm())
+			target, err := url.Parse(nextServer)
 			if err != nil {
 				log.Fatal("Error parsing URL:", err)
 			}

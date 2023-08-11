@@ -4,28 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
+	"github.com/mauricioabreu/load-balancingo/metric"
 	"github.com/mauricioabreu/load-balancingo/p2c"
 	"github.com/mauricioabreu/load-balancingo/proxy"
 	"github.com/mauricioabreu/load-balancingo/roundrobin"
+	"github.com/mauricioabreu/load-balancingo/server"
 )
-
-const (
-	ReadTimeout  = 2 * time.Second
-	WriteTimeout = 2 * time.Second
-	IdleTimeout  = 2 * time.Second
-)
-
-func newServer(address string, handler http.Handler) *http.Server {
-	return &http.Server{
-		Addr:         address,
-		Handler:      handler,
-		ReadTimeout:  ReadTimeout,
-		WriteTimeout: WriteTimeout,
-		IdleTimeout:  IdleTimeout,
-	}
-}
 
 func startServer(address string) {
 	mux := http.NewServeMux()
@@ -34,9 +19,9 @@ func startServer(address string) {
 		fmt.Fprintf(w, "Hello from %s\n", address)
 	})
 
-	server := newServer(address, mux)
+	srv := server.NewServer(address, mux)
 
-	log.Fatal(server.ListenAndServe())
+	log.Fatal(srv.ListenAndServe())
 }
 
 func main() {
@@ -53,7 +38,7 @@ func main() {
 	rrproxy := proxy.NewProxy(rr)
 	pwrproxy := proxy.NewProxy(pwr)
 
-	server := newServer(":8080", nil)
+	srv := server.NewServer(":8080", nil)
 
 	http.HandleFunc("/rr", func(w http.ResponseWriter, r *http.Request) {
 		rrproxy.ServeHTTP(w, r)
@@ -64,6 +49,7 @@ func main() {
 
 	go startServer("127.0.0.1:8081")
 	go startServer("127.0.0.1:8082")
+	go metric.StartServer()
 
-	log.Fatal(server.ListenAndServe())
+	log.Fatal(srv.ListenAndServe())
 }

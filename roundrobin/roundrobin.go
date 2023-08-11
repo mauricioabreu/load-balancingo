@@ -66,6 +66,10 @@ func New(servers ...*server) *Balancer {
 	}
 }
 
+func (b *Balancer) Algorithm() string {
+	return "round_robin"
+}
+
 // Next returns the next server in the load balancing rotation using the round-robin algorithm.
 // It locks the Balancer's mutex to ensure thread safety and updates the current weight of each server.
 // Returns nil if there are no servers available.
