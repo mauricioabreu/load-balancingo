@@ -1,5 +1,7 @@
 # Load Balancing algorithms in go
 
+[![Go](https://github.com/mauricioabreu/load-balancingo/actions/workflows/go.yml/badge.svg)](https://github.com/mauricioabreu/load-balancingo/actions/workflows/go.yml)
+
 Load Balancingo is a hands-on exploration into load balancing algorithms. Dive in to understand how popular mechanisms like Round Robin or Power of Two Choices (P2C) work under the hood.
 
 ## Highlights
