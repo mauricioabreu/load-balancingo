@@ -6,7 +6,7 @@ Load Balancingo is a hands-on exploration into load balancing algorithms. Dive i
 
 ## Highlights
 
-* 📚 Educational Focus: Designed for learning, not just production.
+* 📚 Educational Focus: Designed for learning.
 * 🔄 Algorithms: Round Robin, P2C, and more illustrated.
 * 📊 Metrics: Integrated insights with Prometheus and Grafana.
 
