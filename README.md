@@ -16,6 +16,16 @@ cd load-balancingo
 go run main.go
 ```
 
+## Requirements
+
+You need all these awesome tools below to run this project:
+
+* [`Go`](https://go.dev/) - a good language to build HTTP APIs, workers, daemons and every kind of distribued system service
+* [`Just`](https://github.com/casey/just) - a command runner
+* [`Docker Compose`](https://docs.docker.com/compose/) - define and run multiple containers with ease
+* [`Grafana`](https://grafana.com/) - build charts, dashboards and alerts to observe your systems
+* [`Prometheus`](https://prometheus.io/) - a monitoring system and time series database
+
 ## Testing
 
 You need the go toolchain installed. Then, run `go run main.go` in the root directory.
@@ -35,6 +45,10 @@ Or
 ```bash
 curl http://localhost:8080/p2c
 ```
+
+We also provide a `justfile` with some load testing.
+
+Run `just -l` to list all available commands.
 
 ## Algorithms
 
