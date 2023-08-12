@@ -41,7 +41,8 @@ A power of two choices (P2C) load balancer. Servers are chosen uniformly at rand
 
 How it works:
 
-* Pick two servers at random.
-* Choose the server with the least load.
+* If the list has only one server, choose that server.
+* If the list has two servers, decide between the two based on their load.
+* If the list has more than two servers, choose two at random and decide between them.
 
 ![Power of Two Choices](misc/p2c.png)
