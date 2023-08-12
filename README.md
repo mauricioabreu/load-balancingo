@@ -26,10 +26,22 @@ curl http://localhost:8080/p2c
 
 A uniform/weighted round robin load balancer. Servers are assigned weights, determining selection frequency. Higher weights are favored more. If weights are equal, servers are chosen uniformly.
 
+How it works:
+
+* Servers are assigned weights, determining selection frequency. Higher weights are favored more. If weights are equal, servers are chosen uniformly.
+* Keep track of the index of the last server used.
+* When a new request comes in, use the next server in the list.
+* If the end of the list is reached, start over from the beginning.
+
 ![Round Robin](misc/round_robin.png)
 
 ### Power of Two Choices
 
 A power of two choices (P2C) load balancer. Servers are chosen uniformly at random, and the least loaded server is chosen. This load may be determined by any metric, such as CPU usage, memory usage, or latency.
+
+How it works:
+
+* Pick two servers at random.
+* Choose the server with the least load.
 
 ![Power of Two Choices](misc/p2c.png)
