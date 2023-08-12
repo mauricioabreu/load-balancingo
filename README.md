@@ -1,5 +1,19 @@
 # Load Balancing algorithms in go
 
+Load Balancingo is a hands-on exploration into load balancing algorithms. Dive in to understand how popular mechanisms like Round Robin or Power of Two Choices (P2C) work under the hood.
+
+## Highlights
+
+* 📚 Educational Focus: Designed for learning, not just production.
+* 🔄 Algorithms: Round Robin, P2C, and more illustrated.
+* 📊 Metrics: Integrated insights with Prometheus and Grafana.
+
+```
+git clone https://github.com/mauricioabreu/load-balancingo.git
+cd load-balancingo
+go run main.go
+```
+
 ## Testing
 
 You need the go toolchain installed. Then, run `go run main.go` in the root directory.
