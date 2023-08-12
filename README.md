@@ -21,6 +21,7 @@ go run main.go
 You need all these awesome tools below to run this project:
 
 * [`Go`](https://go.dev/) - a good language to build HTTP APIs, workers, daemons and every kind of distribued system service
+* [`hey`](https://github.com/rakyll/hey) - awesome loading test tool
 * [`Just`](https://github.com/casey/just) - a command runner
 * [`Docker Compose`](https://docs.docker.com/compose/) - define and run multiple containers with ease
 * [`Grafana`](https://grafana.com/) - build charts, dashboards and alerts to observe your systems
