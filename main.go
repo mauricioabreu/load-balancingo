@@ -33,6 +33,7 @@ func main() {
 	pwr := p2c.New(
 		p2c.NewServer("http://127.0.0.1:8081", &p2c.RandomLoadFetcher{}),
 		p2c.NewServer("http://127.0.0.1:8082", &p2c.RandomLoadFetcher{}),
+		p2c.NewServer("http://127.0.0.1:8083", &p2c.RandomLoadFetcher{}),
 	)
 
 	rrproxy := proxy.NewProxy(rr)
@@ -49,6 +50,8 @@ func main() {
 
 	go startServer("127.0.0.1:8081")
 	go startServer("127.0.0.1:8082")
+	go startServer("127.0.0.1:8083")
+
 	go metric.StartServer()
 
 	log.Fatal(srv.ListenAndServe())
