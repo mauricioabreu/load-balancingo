@@ -11,5 +11,3 @@ rr:
 p2c:
     @echo "Sending requests to /p2c endpoint..."
     hey -n {{requests}} -c {{concurrency}} -q {{rate_limit}} "{{base_url}}/p2c"
-
-all: rr p2c

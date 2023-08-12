@@ -12,7 +12,7 @@ import (
 var (
 	algorithmUsedTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "algorith_used_total",
+			Name: "algorithm_used_total",
 			Help: "Number of times a server was chosen including the given algorithm",
 		},
 		[]string{"server", "algorithm"},
